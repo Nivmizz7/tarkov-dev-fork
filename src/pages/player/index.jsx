@@ -5,7 +5,6 @@ import { Turnstile } from "@marsidev/react-turnstile";
 import { Icon } from "@mdi/react";
 import {
     mdiAccountQuestion,
-    mdiAccountSwitch,
     mdiCheck,
     mdiCloseCircle,
     mdiTrophy,
@@ -19,7 +18,7 @@ import {
     mdiFolderOpen,
 } from "@mdi/js";
 import { SimpleTreeView, TreeItem } from "@mui/x-tree-view";
-import { Tooltip } from "@mui/material";
+import { Tooltip, ToggleButtonGroup, ToggleButton } from "@mui/material";
 
 import SEO from "../../components/SEO.jsx";
 import DataTable from "../../components/data-table/index.jsx";
@@ -162,17 +161,15 @@ function Player() {
     const gameMode = params.gameMode;
 
     const [accountId, setAccountId] = useState(params.accountId);
+    const [currentGameMode, setCurrentGameMode] = useState(params.gameMode);
 
-    const otherGameMode = useMemo(() => {
-        if (gameMode === "regular") {
-            return "pve";
-        }
-        return "regular";
-    }, [gameMode]);
-
-    const otherGameModeTranslated = useMemo(() => {
-        return t(`game_mode_${otherGameMode}`);
-    }, [otherGameMode, t]);
+    const handleSwitchGameMode = useCallback(
+        (event) => {
+            setCurrentGameMode(event.target.value);
+            navigate(`/players/${event.target.value}/${accountId}`);
+        },
+        [navigate, accountId],
+    );
 
     const loadingProfile = useMemo(() => {
         return {
@@ -182,7 +179,6 @@ function Player() {
                 side: t("Loading"),
                 experience: 0,
                 memberCategory: 0,
-                bannedState: false,
                 bannedUntil: 0,
                 prestigeLevel: 0,
             },
@@ -383,7 +379,7 @@ function Player() {
     }, [playerData, t]);
 
     const lastActiveDate = useMemo(() => {
-        if (!playerData.skills.Common) {
+        if (!playerData.skills?.Common) {
             return "";
         }
         let latest = 0;
@@ -621,6 +617,170 @@ function Player() {
         return statsData;
     }, [playerData]);
 
+    const arenaOverallColumns = useMemo(
+        () => [
+            {
+                Header: t("Killstreak"),
+                id: "KillsWithoutDeaths",
+                accessor: "KillsWithoutDeaths",
+            },
+            {
+                Header: t("Max Killstreak"),
+                id: "MaxKillsWithoutDeaths",
+                accessor: "MaxKillsWithoutDeaths",
+            },
+            {
+                Header: t("Max Win Streak"),
+                id: "LongestWinStreak",
+                accessor: "LongestWinStreak",
+            },
+            {
+                Header: t("Best ARP"),
+                id: "BestArp",
+                accessor: "BestArp",
+            },
+            {
+                Header: t("Loss Streak"),
+                id: "LoseStreak",
+                accessor: "LoseStreak",
+            },
+            {
+                Header: t("Max Loss Streak"),
+                id: "LongestLoseStreak",
+                accessor: "LongestLoseStreak",
+            },
+        ],
+        [t],
+    );
+
+    const arenaOverallHeadConfig = useMemo(() => {
+        return {
+            align: arenaOverallColumns.map((header) => {
+                return {
+                    id: header.id,
+                    align: "left",
+                };
+            }),
+        };
+    }, [arenaOverallColumns]);
+
+    const arenaOverallData = useMemo(() => {
+        const arenaData = playerData.stat?.arenaOverAllCounters?.UnrankedOverall?.Counters;
+        if (!arenaData) {
+            return [];
+        }
+        return [arenaData];
+    }, [playerData]);
+
+    const arenaModesColumns = useMemo(
+        () => [
+            {
+                Header: t("Mode"),
+                id: "mode",
+                accessor: "mode",
+            },
+            {
+                Header: t("Kills"),
+                id: "Kills",
+                accessor: "Kills",
+            },
+            {
+                Header: t("Deaths"),
+                id: "Deaths",
+                accessor: "Deaths",
+            },
+            {
+                Header: t("K:D", { nsSeparator: "|" }),
+                id: "kdr",
+                accessor: "Kills",
+                Cell: (props) => {
+                    if (props.value === 0) {
+                        return "0";
+                    }
+                    return (props.value / props.row.original.Deaths).toFixed(2);
+                },
+            },
+            {
+                Header: t("Max Killstreak"),
+                id: "MaxKillsWithoutDeaths",
+                accessor: "MaxKillsWithoutDeaths",
+            },
+            {
+                Header: t("Round MVP"),
+                id: "RoundMvpCount",
+                accessor: "RoundMvpCount",
+            },
+            {
+                Header: t("Match MVP"),
+                id: "MatchMvpCount",
+                accessor: "MatchMvpCount",
+            },
+            {
+                Header: t("Max Win Streak"),
+                id: "LongestWinStreak",
+                accessor: "LongestWinStreak",
+            },
+        ],
+        [t],
+    );
+
+    const arenaModesHeadConfig = useMemo(() => {
+        return {
+            align: arenaModesColumns.map((header) => {
+                return {
+                    id: header.id,
+                    align: "left",
+                };
+            }),
+        };
+    }, [arenaModesColumns]);
+
+    const arenaModesData = useMemo(() => {
+        if (!playerData.stat?.arenaOverAllCounters) {
+            return [];
+        }
+        const statModes = {
+            UnrankedTeamFight: "Team Fight",
+            UnrankedLastHero: "Last Hero",
+            UnrankedCheckPoint: "Checkpoint",
+            UnrankedBlastGang: "Blast Gang",
+        };
+        const statTypes = [
+            "Kills",
+            "Deaths",
+            "MaxKillsWithoutDeaths",
+            "RoundMvpCount",
+            "MatchMvpCount",
+            "LongestWinStreak",
+        ];
+        const getStats = (mode) => {
+            return {
+                mode,
+                ...statTypes.reduce((all, s) => {
+                    all[s] = 0;
+                    return all;
+                }, {}),
+            };
+        };
+        const totalStats = getStats("Total");
+        const statsData = [totalStats];
+        for (const modeKey in statModes) {
+            const modeLabel = statModes[modeKey];
+            const stats = playerData.stat?.arenaOverAllCounters?.[modeKey]?.Counters;
+            if (!stats) {
+                console.log(modeKey, Object.keys(playerData.stat?.arenaOverAllCounters));
+                continue;
+            }
+            const currentData = getStats(modeLabel);
+            for (const st of statTypes) {
+                currentData[st] = stats[st] ?? 0;
+                totalStats[st] += currentData[st];
+            }
+            statsData.push(currentData);
+        }
+        return statsData;
+    }, [playerData]);
+
     const skillsColumns = useMemo(
         () => [
             {
@@ -782,7 +942,7 @@ function Player() {
     }, [playerData, handbook, items]);
 
     const totalTimeInGame = useMemo(() => {
-        const totalSecondsInGame = playerData.pmcStats?.eft?.totalInGameTime || 0;
+        const totalSecondsInGame = playerData.pmcStats?.eft?.totalInGameTime ?? playerData.stat?.totalInGameTime ?? 0;
         if (!totalSecondsInGame) {
             return "";
         }
@@ -963,14 +1123,14 @@ function Player() {
 
     const getLoadoutInSlot = useCallback(
         (slot) => {
-            if (playerData?.equipment?.Id === undefined) {
+            const baseEquipmentId = playerData.equipment.Id ?? playerData.equipment.id;
+            if (baseEquipmentId === undefined) {
                 return "None";
             }
+            const equipmentItems = playerData.equipment.Items ?? playerData.equipment.items;
 
-            let loadoutRoot = playerData.equipment.Items.find((i) => i._id === playerData.equipment.Id);
-            let loadoutItem = playerData.equipment.Items.find(
-                (i) => i.slotId === slot && i.parentId === loadoutRoot._id,
-            );
+            let loadoutRoot = equipmentItems.find((i) => i._id === baseEquipmentId);
+            let loadoutItem = equipmentItems.find((i) => i.slotId === slot && i.parentId === loadoutRoot._id);
 
             if (loadoutItem === undefined) {
                 return "None";
@@ -979,7 +1139,7 @@ function Player() {
             let itemImage = undefined;
             let itemLabel = "";
             let contents = [];
-            let itemDisplay = getItemDisplay(loadoutItem, {}, playerData.equipment.Items);
+            let itemDisplay = getItemDisplay(loadoutItem, {}, equipmentItems);
             if (itemDisplay) {
                 itemImage = itemDisplay.image;
             } else {
@@ -1070,12 +1230,22 @@ function Player() {
             return;
         }
 
+        let cust = playerData.customization;
+        if (cust.upperSuitId) {
+            cust = {
+                head: "5cc084dd14c02e000b0550a3",
+                body: "5cc0858d14c02e000c6bea66",
+                feet: "5cc085bb14c02e000e67a5c5",
+                hands: "5cc0876314c02e000c6bea6b",
+            };
+        }
+
         const url = new URL(`https://imagemagic.tarkov.dev/player/${playerData.aid}.webp`);
         url.searchParams.set(
             "data",
             JSON.stringify({
                 aid: playerData.aid,
-                customization: playerData.customization,
+                customization: cust,
                 equipment: playerData.equipment,
             }),
         );
@@ -1131,20 +1301,36 @@ function Player() {
                         <Icon path={mdiFolderOpen} size={1} className="icon-with-text" />
                     </button>
                 </Tooltip>
-                <Tooltip
-                    title={t("Switch to {{gameMode}} profile", { gameMode: otherGameModeTranslated })}
-                    placement="bottom"
-                    arrow
+                <ToggleButtonGroup
+                    size="small"
+                    value={currentGameMode}
+                    onChange={handleSwitchGameMode}
+                    className="profile-button"
                 >
-                    <button
-                        className="profile-button switch"
-                        onClick={() => {
-                            navigate(`/players/${otherGameMode}/${accountId}`);
-                        }}
+                    <Tooltip
+                        title={t("Switch to {{gameMode}} profile", { gameMode: "regular" })}
+                        placement="bottom"
+                        arrow
                     >
-                        <Icon path={mdiAccountSwitch} size={1} className="icon-with-text" />
-                    </button>
-                </Tooltip>
+                        <ToggleButton value="regular" key="gamemode-regular">
+                            {t("game_mode_regular")}
+                        </ToggleButton>
+                    </Tooltip>
+                    <Tooltip title={t("Switch to {{gameMode}} profile", { gameMode: "pve" })} placement="bottom" arrow>
+                        <ToggleButton value="pve" key="gamemode-pve">
+                            {t("game_mode_pve")}
+                        </ToggleButton>
+                    </Tooltip>
+                    <Tooltip
+                        title={t("Switch to {{gameMode}} profile", { gameMode: "arena" })}
+                        placement="bottom"
+                        arrow
+                    >
+                        <ToggleButton value="arena" key="gamemode-arena">
+                            {t("game_mode_arena")}
+                        </ToggleButton>
+                    </Tooltip>
+                </ToggleButtonGroup>
                 <Turnstile
                     ref={turnstileRef}
                     className="turnstile-widget"
@@ -1275,7 +1461,7 @@ function Player() {
                 </div>
             </div>
             <div>
-                {playerData.equipment?.Items?.length > 0 && (
+                {(playerData.equipment?.Items?.length > 0 || playerData.equipment?.items?.length) && (
                     <>
                         <h2>
                             <Icon path={mdiBagPersonal} size={1.5} className="icon-with-text" />
@@ -1356,6 +1542,34 @@ function Player() {
                             columns={raidsColumns}
                             data={raidsData}
                             headConfig={raidsTableHeadConfig}
+                        />
+                    </>
+                )}
+                {arenaOverallData?.length > 0 && (
+                    <>
+                        <h2 key="arena-overall-title">
+                            <Icon path={mdiChartLine} size={1.5} className="icon-with-text" />
+                            {t("Arena Stats")}
+                        </h2>
+                        <DataTable
+                            key="arena-table"
+                            columns={arenaOverallColumns}
+                            data={arenaOverallData}
+                            headConfig={arenaOverallHeadConfig}
+                        />
+                    </>
+                )}
+                {arenaModesData?.length > 0 && (
+                    <>
+                        <h2 key="arena-modes-title">
+                            <Icon path={mdiChartLine} size={1.5} className="icon-with-text" />
+                            {t("Arena Mode Stats")}
+                        </h2>
+                        <DataTable
+                            key="arena-modes-table"
+                            columns={arenaModesColumns}
+                            data={arenaModesData}
+                            headConfig={arenaModesHeadConfig}
                         />
                     </>
                 )}
