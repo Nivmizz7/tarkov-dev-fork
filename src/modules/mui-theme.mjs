@@ -137,6 +137,20 @@ const theme = createTheme({
                 },
             },
         },
+        MuiToggleButton: {
+            styleOverrides: {
+                root: {
+                    "backgroundColor": "var(--color-gold-two)",
+                    "color": "rgb(0, 0, 0)",
+                    "fontWeight": "bold",
+                    "margin": "0px 2px",
+                    "&.MuiToggleButton-root.Mui-selected": {
+                        backgroundColor: "var(--color-gold-one)",
+                        color: "rgb(0, 0, 0)",
+                    },
+                },
+            },
+        },
     },
 });
 

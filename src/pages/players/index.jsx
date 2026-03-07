@@ -135,6 +135,8 @@ function Players() {
         }
     }, [enterPress, searchForName]);
 
+    const gameModesWithArena = [...gameModes, "arena"];
+
     return [
         <SEO
             title={`${t("Players")} - ${t("Escape from Tarkov")} - ${t("Tarkov.dev")}`}
@@ -163,7 +165,7 @@ function Players() {
                     label={t("Game mode")}
                     placeholder={t(`game_mode_${defaultGameMode}`)}
                     defaultValue={defaultGameMode}
-                    options={gameModes.map((m) => {
+                    options={gameModesWithArena.map((m) => {
                         return {
                             label: t(`game_mode_${m}`),
                             value: m,
