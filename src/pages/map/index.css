@@ -136,11 +136,6 @@ div.leaflet-pane.leaflet-overlay-pane > svg.off-level g.base-layer {
     opacity: 0.2;
 }
 
-div.awesome-marker.off-level {
-    opacity: 0.2;
-    z-index: -9999 !important;
-}
-
 div.leaflet-pane.leaflet-marker-pane > .off-level {
     opacity: 0.2;
     z-index: -9999 !important;
@@ -148,6 +143,7 @@ div.leaflet-pane.leaflet-marker-pane > .off-level {
 
 .leaflet-container.always-show-snipers div.leaflet-pane.leaflet-marker-pane > .off-level.sniper-spawn {
     opacity: 1;
+    z-index: initial !important;
 }
 
 div.leaflet-overlay-pane > svg.leaflet-zoom-animated > g > path.off-level {

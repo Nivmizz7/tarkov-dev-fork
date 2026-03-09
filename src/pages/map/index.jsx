@@ -555,6 +555,9 @@ function Map() {
             mapSettingsRef.current[e.settingName] = e.settingValue;
             updateSavedMapSettings();
         });
+        if (mapSettingsRef.current.alwaysShowSnipers ?? true) {
+            map._container.classList.add("always-show-snipers");
+        }
 
         map.raidInfoControl = L.control
             .raidInfo({
@@ -2164,7 +2167,7 @@ function Map() {
             key="seo-wrapper"
         />,
         <div
-            className={`display-wrapper map-page${savedMapSettings.showOnlyActiveTasks ? " only-active-quest-markers" : ""}${savedMapSettings.alwaysShowSnipers ? " always-show-snipers" : ""}`}
+            className={`display-wrapper map-page${savedMapSettings.showOnlyActiveTasks ? " only-active-quest-markers" : ""}`}
             key="map-wrapper"
         >
             {mapData.projection !== "interactive" && [
