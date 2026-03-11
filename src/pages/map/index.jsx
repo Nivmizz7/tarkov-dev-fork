@@ -576,8 +576,8 @@ function Map() {
                 descriptionText: tMaps("Supports multisearch (e.g. 'labs, ledx, bitcoin')"),
                 taskFilterTitle: tMaps("Task Filter"),
                 taskFilterPlaceholderText: tMaps("Task name"),
-                showAllButtonText: tMaps("Show"),
-                hideAllButtonText: tMaps("Hide"),
+                showAllButtonText: tMaps("All"),
+                hideAllButtonText: tMaps("None"),
                 collapsed: !mapSettingsRef.current.expandSearch,
                 hiddenTasks: mapSettingsRef.current.hiddenTasks,
             })

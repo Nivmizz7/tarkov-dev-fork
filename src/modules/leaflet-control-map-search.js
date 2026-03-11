@@ -181,7 +181,7 @@ L.Control.MapSearch = L.Control.extend({
             taskFilterTitleDiv,
         );
         const showAllButton = L.DomUtil.create("button", "maps-search-task-filter-show-all", buttonContainer);
-        showAllButton.innerText = this.options.showAllButtonText ?? "Show";
+        showAllButton.innerText = this.options.showAllButtonText ?? "All";
         showAllButton.type = "button";
         showAllButton.addEventListener("click", () => {
             const taskChecks = this.taskListDiv.getElementsByClassName("maps-search-task-selector");
@@ -200,7 +200,7 @@ L.Control.MapSearch = L.Control.extend({
             this._eventTarget.dispatchEvent(event);
         });
         const hideAllButton = L.DomUtil.create("button", "maps-search-task-filter-hide-all", buttonContainer);
-        hideAllButton.innerText = this.options.hideAllButtonText ?? "Hide";
+        hideAllButton.innerText = this.options.hideAllButtonText ?? "None";
         hideAllButton.type = "button";
         hideAllButton.addEventListener("click", () => {
             const taskChecks = this.taskListDiv.getElementsByClassName("maps-search-task-selector");
