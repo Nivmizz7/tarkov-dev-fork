@@ -22,7 +22,7 @@ import BarterTooltip from "../barter-tooltip/index.jsx";
 import formatPrice from "../../modules/format-price.js";
 import { getCheapestPrice } from "../../modules/format-cost-items.js";
 
-import useItemsData from "../../features/items/index.js";
+import useItemsData, { useHandbookData } from "../../features/items/index.js";
 import useBartersData from "../../features/barters/index.js";
 import useCraftsData from "../../features/crafts/index.js";
 import useTradersData from "../../features/traders/index.js";
@@ -45,6 +45,7 @@ function ItemsSummaryTable({ includeItems, includeTraders, includeStations }) {
     const { data: crafts } = useCraftsData();
     const { data: traders } = useTradersData();
     const { data: stations } = useHideoutData();
+    const { data: handbook } = useHandbookData();
 
     const data = useMemo(() => {
         const requiredItems = items
@@ -337,7 +338,9 @@ function ItemsSummaryTable({ includeItems, includeTraders, includeStations }) {
                             tipContent.push(
                                 <div key={"no-flea-tooltip"}>{t("This item can't be sold on the Flea Market")}</div>,
                             );
-                        } else if (!settings.hasFlea) {
+                        } else if (
+                            !(handbook.fleaMarket.enabled && settings.playerLevel >= props.row.original.minLevelForFlea)
+                        ) {
                             priceContent.push(
                                 <Icon
                                     path={mdiCloseOctagon}
@@ -346,6 +349,7 @@ function ItemsSummaryTable({ includeItems, includeTraders, includeStations }) {
                                     key="no-prices-icon"
                                 />,
                             );
+
                             tipContent.push(<div key={"no-flea-tooltip"}>{t("Flea Market not available")}</div>);
                         } else {
                             let tipText = t("Not scanned on the Flea Market");
@@ -395,7 +399,7 @@ function ItemsSummaryTable({ includeItems, includeTraders, includeStations }) {
         ];
 
         return useColumns;
-    }, [t, items, barters, crafts, stations, settings]);
+    }, [t, items, barters, crafts, stations, settings, handbook]);
 
     const extraRow = (
         <>

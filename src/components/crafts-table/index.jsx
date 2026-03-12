@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -34,13 +34,6 @@ function CraftTable({
 }) {
     const { t } = useTranslation();
     const settings = useSelector((state) => state.settings[state.settings.gameMode]);
-    const { includeFlea, hasJaeger, completedQuests } = useMemo(() => {
-        return {
-            includeFlea: settings.hasFlea,
-            hasJaeger: settings.jaeger !== 0,
-            completedQuests: settings.completedQuests,
-        };
-    }, [settings]);
     const stations = useSelector(selectAllStations);
     const skills = useSelector(selectAllSkills);
     const [skippedBySettings, setSkippedBySettings] = useState(false);
@@ -54,6 +47,21 @@ function CraftTable({
     const { data: handbook } = useHandbookData();
 
     const { data: hideout } = useHideoutData();
+
+    const { fleaUnlocked, hasJaeger, completedQuests } = useMemo(() => {
+        return {
+            fleaUnlocked: handbook.fleaMarket.enabled && settings.playerLevel >= handbook.fleaMarket.minPlayerLevel,
+            hasJaeger: settings.jaeger !== 0,
+            completedQuests: settings.completedQuests,
+        };
+    }, [settings, handbook]);
+
+    const availableOnFlea = useCallback(
+        (item) => {
+            return showAll || (handbook.fleaMarket.enabled && settings.playerLevel >= item.minLevelForFlea);
+        },
+        [settings, handbook],
+    );
 
     const data = useMemo(() => {
         let addedStations = {};
@@ -222,7 +230,11 @@ function CraftTable({
                     fleaPriceToUse = craftRewardItem.lastLowPrice;
                 }
 
-                if (!tradeData.cached && !craftRewardItem.types.includes("noFlea") && (showAll || includeFlea)) {
+                if (
+                    !tradeData.cached &&
+                    !craftRewardItem.types.includes("noFlea") &&
+                    availableOnFlea(craftRewardItem)
+                ) {
                     const bestFleaPrice = bestPrice(
                         craftRewardItem,
                         handbook?.fleaMarket?.sellOfferFeeRate,
@@ -342,7 +354,6 @@ function CraftTable({
         barters,
         hideout,
         completedQuests,
-        includeFlea,
         hasJaeger,
         itemFilter,
         stations,
@@ -355,6 +366,7 @@ function CraftTable({
         sortState,
         useCraftIngredients,
         useBarterIngredients,
+        availableOnFlea,
     ]);
 
     const columns = useMemo(
@@ -454,7 +466,7 @@ function CraftTable({
                     return <ValueCell value={props.value} valueCount={props.row.original.reward.count} />;
                 },
             },
-            ...(includeFlea
+            ...(fleaUnlocked
                 ? [
                       {
                           Header: t("Flea throughput/h"),
@@ -509,7 +521,7 @@ function CraftTable({
                 },
             },
         ],
-        [t, includeFlea, selectedStation, showAll, crafts, barters, useCraftIngredients, useBarterIngredients],
+        [t, fleaUnlocked, selectedStation, showAll, crafts, barters, useCraftIngredients, useBarterIngredients],
     );
 
     let extraRow = false;

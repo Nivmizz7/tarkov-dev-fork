@@ -84,7 +84,7 @@ function RangeFilter({
     max,
     marks,
     onChange,
-    reverse = false,
+    track = "normal",
     style = {},
     size = "medium",
     step = 1,
@@ -94,7 +94,7 @@ function RangeFilter({
         marks = Object.keys(marks).map((val) => {
             return {
                 label: String(marks[val]),
-                value: val,
+                value: parseInt(val),
             };
         });
     }
@@ -102,7 +102,6 @@ function RangeFilter({
         <div className={"filter-slider-wrapper"}>
             <div className={"filter-slider-label"}>{label}</div>
             <Slider
-                range={true}
                 defaultValue={defaultValue}
                 value={value}
                 step={step}
@@ -110,7 +109,7 @@ function RangeFilter({
                 max={max}
                 marks={marks}
                 onChange={onChange}
-                reverse={reverse}
+                track={track}
                 style={{
                     width: "170px",
                     ...style,
@@ -354,6 +353,7 @@ function InputFilter({
     tooltip,
     inputMode,
     parentRef,
+    isDisabled = false,
 }) {
     return (
         <ConditionalWrapper
@@ -379,6 +379,7 @@ function InputFilter({
                     min={min}
                     max={max}
                     ref={parentRef}
+                    disabled={isDisabled}
                 />
             </label>
         </ConditionalWrapper>

@@ -14,7 +14,7 @@ function getCheapestCashPrice(item, settings = {}, allowAllSources = false) {
             return false;
         }
         if (buyFor.vendor.normalizedName === "flea-market") {
-            return allowAllSources || settings.hasFlea;
+            return allowAllSources || settings.playerLevel >= item.minLevelForFlea;
         }
         if (!allowAllSources && settings[buyFor.vendor.normalizedName] < buyFor.vendor.minTraderLevel) {
             return false;

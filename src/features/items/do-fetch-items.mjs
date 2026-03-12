@@ -49,6 +49,7 @@ class ItemsQuery extends APIQuery {
                     buyFor {
                         ...ItemPriceFragment
                     }
+                    minLevelForFlea
                     containsItems {
                         count
                         item {

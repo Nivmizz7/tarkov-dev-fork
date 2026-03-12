@@ -13,7 +13,7 @@ import CheekiBreekiEffect from "../../components/cheeki-breeki-effect/index.jsx"
 import {
     //selectAllTraders as traderSettings,
     selectAllStations,
-    toggleFlea,
+    setPlayerLevel,
     setMinDogtagLevel,
     selectAllSkills,
     setTarkovTrackerAPIKey,
@@ -70,13 +70,13 @@ function Settings() {
     //const allTraders = useSelector(traderSettings);
     const allStations = useSelector(selectAllStations);
     const allSkills = useSelector(selectAllSkills);
-    const hasFlea = useSelector((state) => state.settings[state.settings.gameMode].hasFlea);
     const useTarkovTracker = useSelector((state) => state.settings[state.settings.gameMode].useTarkovTracker);
     const hideDogtagBarters = useSelector((state) => state.settings[state.settings.gameMode].hideDogtagBarters);
     const gameMode = useSelector((state) => state.settings.gameMode);
     const trackerDomain = useSelector((state) => state.settings.tarkovTrackerDomain);
     const [selectedTrackerDomain, setSelectedTrackerDomain] = useState(trackerDomain);
     const trackerTokenRef = useRef();
+    const playerLevelRef = useRef();
 
     const stationRefs = {
         "bitcoin-farm": useRef(null),
@@ -94,7 +94,8 @@ function Settings() {
     const { data: allTraders } = useTradersData();
 
     const traders = useMemo(() => {
-        return allTraders.filter((t) => t.normalizedName !== "lightkeeper" && t.normalizedName !== "btr-driver");
+        const skipTraders = ["lightkeeper", "btr-driver", "radio-station", "taran", "mr-kerman", "voevoda"];
+        return allTraders.filter((t) => !skipTraders.includes(t.normalizedName));
     }, [allTraders]);
 
     const { data: hideout } = useHideoutData();
@@ -172,23 +173,23 @@ function Settings() {
         />,
         <div className={"page-wrapper"}>
             <h1>{t("Settings")}</h1>
-            <div className="language-toggle-wrapper settings-group-wrapper">
-                <h2>{t("Language")}</h2>
-                <Select
-                    placeholder={i18n.language}
-                    options={langOptions}
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                    onChange={(event) => {
-                        handleLangChange({
-                            target: language,
-                            value: event.value,
-                        });
-                    }}
-                />
-            </div>
             <div className={"settings-group-wrapper"}>
                 <h2>{t("General")}</h2>
+                <label className={"single-filter-wrapper language-toggle-wrapper"}>
+                    <span className={"single-filter-label"}>{t("Language")}</span>
+                    <Select
+                        placeholder={i18n.language}
+                        options={langOptions}
+                        className="basic-multi-select language"
+                        classNamePrefix="select"
+                        onChange={(event) => {
+                            handleLangChange({
+                                target: language,
+                                value: event.value,
+                            });
+                        }}
+                    />
+                </label>
                 <label className={"single-filter-wrapper"}>
                     <span className={"single-filter-label"}>{t("Game mode")}</span>
                     <Select
@@ -209,12 +210,19 @@ function Settings() {
                         }}
                     />
                 </label>
-                <ToggleFilter
-                    label={t("Has flea")}
-                    onChange={() => dispatch(toggleFlea(!hasFlea))}
-                    checked={hasFlea}
-                    disabled={useTarkovTracker}
+                <InputFilter
+                    parentRef={playerLevelRef}
+                    label={t("Player level")}
+                    defaultValue={useSelector((state) => state.settings[state.settings.gameMode].playerLevel)}
+                    type="text"
+                    placeholder={t("Level")}
+                    onChange={(event) => {
+                        dispatch(setPlayerLevel(event.target.value));
+                    }}
+                    isDisabled={useTarkovTracker}
                 />
+            </div>
+            <div className={"settings-group-wrapper"}>
                 <ToggleFilter
                     label={t("Use TarkovTracker")}
                     onChange={() => dispatch(toggleTarkovTracker(!useTarkovTracker))}

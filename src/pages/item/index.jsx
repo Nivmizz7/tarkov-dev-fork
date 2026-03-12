@@ -1,7 +1,7 @@
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Tooltip } from "@mui/material";
+import { Tooltip, Badge } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import Select from "react-select";
 
@@ -70,16 +70,6 @@ function TraderPrice({ currency, price, priceRUB }) {
     }
 
     return formatPrice(priceRUB);
-}
-
-function priceIsLocked(buyFor, settings) {
-    let className = "";
-    if (buyFor.vendor.trader && settings[buyFor.vendor.normalizedName] < buyFor.vendor.minTraderLevel) {
-        className = " locked";
-    } else if (buyFor.vendor.normalizedName === "flea-market" && !settings.hasFlea) {
-        className = " locked";
-    }
-    return className;
 }
 
 function Item() {
@@ -223,6 +213,22 @@ function Item() {
         }
         return item;
     }, [items, itemName, handbook, itemsStatus, loadingData, maps]);
+
+    const priceIsLocked = useCallback(
+        (item, buyFor) => {
+            let className = "";
+            if (buyFor.vendor.trader && settings[buyFor.vendor.normalizedName] < buyFor.vendor.minTraderLevel) {
+                className = " locked";
+            } else if (
+                buyFor.vendor.normalizedName === "flea-market" &&
+                (!handbook.fleaMarket.enabled || settings.playerLevel < item.minLevelForFlea)
+            ) {
+                className = " locked";
+            }
+            return className;
+        },
+        [settings, handbook],
+    );
 
     const questsRequiringCount = useMemo(() => {
         if (!currentItemData || currentItemData.id === "loading") {
@@ -557,14 +563,26 @@ The max profitable price is impacted by the intel center and hideout management 
                                             className={`text-and-image-information-wrapper ${sellForTradersIsTheBest ? "" : "best-profit"}`}
                                             key={`${currentItemData.id}-flea-market-price-sell`}
                                         >
-                                            <img
-                                                alt="Flea market"
-                                                height="86"
-                                                width="86"
-                                                src={`${process.env.PUBLIC_URL}/images/traders/flea-market-portrait.png`}
-                                                loading="lazy"
-                                                // title = {`Sell ${currentItemData.name} on the Flea market`}
-                                            />
+                                            <Badge
+                                                badgeContent={currentItemData.minLevelForFlea}
+                                                color={
+                                                    settings.playerLevel >= currentItemData.minLevelForFlea
+                                                        ? "success"
+                                                        : "warning"
+                                                }
+                                                title={t("Player level: {{playerLevel}}", {
+                                                    playerLevel: currentItemData.minLevelForFlea,
+                                                })}
+                                            >
+                                                <img
+                                                    alt="Flea market"
+                                                    height="86"
+                                                    width="86"
+                                                    src={`${process.env.PUBLIC_URL}/images/traders/flea-market-portrait.png`}
+                                                    loading="lazy"
+                                                    // title = {`Sell ${currentItemData.name} on the Flea market`}
+                                                />
+                                            </Badge>
                                             <div className="price-wrapper">
                                                 {fleaSellIcon}
                                                 {fleaSellPriceDisplay}
@@ -670,17 +688,41 @@ The max profitable price is impacted by the intel center and hideout management 
                                                         </Link>
                                                     )}
                                                 >
-                                                    <img
-                                                        alt={buyForSource.vendor.name}
-                                                        height="86"
-                                                        width="86"
-                                                        loading="lazy"
-                                                        src={`${process.env.PUBLIC_URL}/images/traders/${buyForSource.vendor.normalizedName}-portrait.png`}
-                                                    />
+                                                    <ConditionalWrapper
+                                                        condition={buyForSource.vendor.normalizedName === "flea-market"}
+                                                        wrapper={(children) => (
+                                                            <Badge
+                                                                badgeContent={
+                                                                    buyForSource.vendor.normalizedName === "flea-market"
+                                                                        ? currentItemData.minLevelForFlea
+                                                                        : null
+                                                                }
+                                                                color={
+                                                                    settings.playerLevel >=
+                                                                    currentItemData.minLevelForFlea
+                                                                        ? "success"
+                                                                        : "warning"
+                                                                }
+                                                                title={t("Player level: {{playerLevel}}", {
+                                                                    playerLevel: currentItemData.minLevelForFlea,
+                                                                })}
+                                                            >
+                                                                {children}
+                                                            </Badge>
+                                                        )}
+                                                    >
+                                                        <img
+                                                            alt={buyForSource.vendor.name}
+                                                            height="86"
+                                                            width="86"
+                                                            loading="lazy"
+                                                            src={`${process.env.PUBLIC_URL}/images/traders/${buyForSource.vendor.normalizedName}-portrait.png`}
+                                                        />
+                                                    </ConditionalWrapper>
                                                 </ConditionalWrapper>
                                             </div>
                                             <div
-                                                className={`price-wrapper ${index === 0 ? "best-profit" : ""}${priceIsLocked(buyForSource, settings)}`}
+                                                className={`price-wrapper ${index === 0 ? "best-profit" : ""}${priceIsLocked(currentItemData, buyForSource, settings)}`}
                                             >
                                                 <TraderPrice
                                                     currency={buyForSource.currency}

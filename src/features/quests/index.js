@@ -75,7 +75,7 @@ export const selectQuestsWithActive = createSelector(
                     return false;
                 }
                 if (settings[settings.gameMode].playerLevel < quest.minPlayerLevel) {
-                    //return false;
+                    return false;
                 }
                 if (
                     quest.factionName !== "Any" &&

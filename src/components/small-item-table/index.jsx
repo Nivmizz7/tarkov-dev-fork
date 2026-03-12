@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -273,6 +273,13 @@ function SmallItemTable(props) {
         return { materialDestructibilityMap: destruct, materialRepairabilityMap: repair };
     }, [handbook]);
 
+    const availableOnFlea = useCallback(
+        (item) => {
+            return handbook.fleaMarket.enabled && settings.playerLevel >= item.minLevelForFlea;
+        },
+        [settings, handbook],
+    );
+
     // Create a constant of all data returned
     const { data: items, status: itemsStatus } = useItemsData();
 
@@ -322,7 +329,11 @@ function SmallItemTable(props) {
                 itemLink: `/item/${itemData.normalizedName}`,
                 types: itemData.types,
                 buyFor: itemData.buyFor.filter((buyFor) => {
-                    if (!showAllSources && !settings.hasFlea && buyFor.vendor.normalizedName === "flea-market") {
+                    if (
+                        !showAllSources &&
+                        buyFor.vendor.normalizedName === "flea-market" &&
+                        !availableOnFlea(itemData)
+                    ) {
                         return false;
                     }
                     if (!showAllSources && settings[buyFor.vendor.normalizedName] < buyFor.vendor.minTraderLevel) {
@@ -349,7 +360,8 @@ function SmallItemTable(props) {
                 sellFor: itemData.sellFor,
                 buyOnFleaPrice: itemData.buyFor.find(
                     (buyPrice) =>
-                        buyPrice.vendor.normalizedName === "flea-market" && (showAllSources || settings.hasFlea),
+                        buyPrice.vendor.normalizedName === "flea-market" &&
+                        (showAllSources || availableOnFlea(itemData)),
                 ),
                 barters: barters.filter((barter) => {
                     if (!barter.rewardItems[0]) {
@@ -377,6 +389,7 @@ function SmallItemTable(props) {
                 height: itemData.height,
                 cached: itemData.cached,
                 pricePerSlot: 0,
+                minLevelForFlea: itemData.minLevelForFlea,
             };
 
             formattedItem.sellForTradersBest = itemData.sellFor.reduce((best, sellFor) => {
@@ -398,7 +411,7 @@ function SmallItemTable(props) {
                 return best;
             }, undefined);
 
-            if (!showAllSources && !settings.hasFlea) {
+            if (!showAllSources && !availableOnFlea(formattedItem)) {
                 formattedItem.buyOnFleaPrice = 0;
             }
 
@@ -418,7 +431,7 @@ function SmallItemTable(props) {
             }
             formattedItem.cheapestObtainPrice = Number.MAX_SAFE_INTEGER;
             formattedItem.cheapestObtainInfo = null;
-            if (formattedItem.cheapestBarter && (settings.hasFlea || showAllSources)) {
+            if (formattedItem.cheapestBarter && (availableOnFlea(formattedItem) || showAllSources)) {
                 //console.log(formattedItem.cheapestBarter.barter, settings[formattedItem.cheapestBarter.barter.trader.normalizedName]);
                 //if (!showAllSources && settings[buyFor.vendor.normalizedName] < buyFor.vendor.minTraderLevel)
                 formattedItem.cheapestObtainPrice = formattedItem.cheapestBarter.pricePerUnit;
@@ -430,7 +443,11 @@ function SmallItemTable(props) {
                     formattedItem.cheapestObtainInfo = buyFor;
                 }
             }
-            if (!formattedItem.cheapestObtainInfo && (settings.hasFlea || showAllSources) && !traderBuybackFilter) {
+            if (
+                !formattedItem.cheapestObtainInfo &&
+                (availableOnFlea(formattedItem) || showAllSources) &&
+                !traderBuybackFilter
+            ) {
                 const cheapestCraft = getCheapestCraft(itemData, {
                     crafts,
                     settings,
@@ -1943,7 +1960,7 @@ function SmallItemTable(props) {
                             tipContent.push(
                                 <div key={"no-flea-tooltip"}>{t("This item can't be sold on the Flea Market")}</div>,
                             );
-                        } else if (!settings.hasFlea) {
+                        } else if (!availableOnFlea(props.row.original)) {
                             priceContent.push(
                                 <Icon
                                     path={mdiCloseOctagon}
