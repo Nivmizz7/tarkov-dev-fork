@@ -203,6 +203,9 @@ function Item() {
                     .filter((map) => map.locks.some((l) => l.key.id === item.id))
                     .sort((a, b) => a.name.localeCompare(b.name));
             }
+            if (item.properties.defaultPreset) {
+                extraProps.defaultPreset = items.find((i) => i.id === item.properties.defaultPreset.id);
+            }
             return {
                 ...item,
                 properties: {

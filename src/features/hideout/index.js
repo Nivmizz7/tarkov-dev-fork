@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import equal from "fast-deep-equal";
 
 import doFetchHideout from "./do-fetch-hideout.mjs";
 
 import { langCode, useLangCode } from "../../modules/lang-helpers.js";
-import { placeholderHideout } from "../../modules/placeholder-data.js";
 import { windowHasFocus } from "../../modules/window-focus-handler.mjs";
 import { setDataLoading, setDataLoaded } from "../settings/settingsSlice.mjs";
+import useCraftsData, { selectAllCrafts } from "../crafts/index.js";
 
 const initialState = {
-    data: placeholderHideout(langCode()),
+    data: [],
     status: "idle",
     error: null,
 };
@@ -47,7 +47,18 @@ const hideoutSlice = createSlice({
 
 export const hideoutReducer = hideoutSlice.reducer;
 
-export const selectAllHideoutModules = (state) => state.hideout.data;
+export const selectHideoutModules = (state) => state.hideout.data;
+
+export const selectAllHideoutModules = createSelector([selectHideoutModules, selectAllCrafts], (stations, crafts) => {
+    return stations.map((station) => {
+        station.crafts = crafts.reduce((crafts, craft) => {
+            if (craft.station.id === station.id) {
+                crafts.push({ id: craft.id });
+            }
+            return crafts;
+        }, []);
+    });
+});
 
 let fetchedLang = false;
 let fetchedGameMode = false;
@@ -74,6 +85,8 @@ export default function useHideoutData() {
             dispatch(setDataLoaded(dataName));
         }
     }, [status, dispatch]);
+
+    useCraftsData();
 
     useEffect(() => {
         if (fetchedLang !== lang || fetchedGameMode !== gameMode) {

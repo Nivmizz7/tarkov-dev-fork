@@ -16,7 +16,7 @@ import useTradersData from "../../features/traders/index.js";
 import useItemsData, { useHandbookData } from "../../features/items/index.js";
 import useMapsData from "../../features/maps/index.js";
 import useHideoutData from "../../features/hideout/index.js";
-import useBossesData from "../../features/bosses/index.js";
+import { useBossesData } from "../../features/maps/index.js";
 
 import { TaskObjective, TaskRewards } from "../../modules/task-elements.mjs";
 import ItemImage from "../../components/item-image/index.jsx";
@@ -162,7 +162,7 @@ function Prestige() {
                     <ul>
                         {stashTransfer.itemFilters.allowedCategories
                             .map((allowedCat) => {
-                                const category = handbook.itemCategories.find((cat) => cat.id === allowedCat.id);
+                                const category = handbook.itemCategories?.find((cat) => cat.id === allowedCat.id);
                                 if (!category) {
                                     return false;
                                 }

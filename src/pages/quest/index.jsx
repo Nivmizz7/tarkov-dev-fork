@@ -36,7 +36,7 @@ import useTradersData from "../../features/traders/index.js";
 import useItemsData, { useHandbookData } from "../../features/items/index.js";
 import useMapsData from "../../features/maps/index.js";
 import useHideoutData from "../../features/hideout/index.js";
-import useBossesData from "../../features/bosses/index.js";
+import { useBossesData } from "../../features/maps/index.js";
 
 import { TaskObjective, TaskRewards } from "../../modules/task-elements.mjs";
 
@@ -231,6 +231,9 @@ function Quest() {
                     <span>
                         {repReqs.map((traderRep) => {
                             const trader = traders.find((trad) => trad.id === traderRep.trader.id);
+                            if (!trader) {
+                                return <div key={`req-trader-${trader.id}`}></div>;
+                            }
                             return (
                                 <div key={`req-trader-${trader.id}`}>
                                     <Link to={`/trader/${trader.normalizedName}`}>{trader.name}</Link>

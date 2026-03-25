@@ -25,7 +25,7 @@ import { getRelativeTimeAndUnit } from "../../modules/format-duration.js";
 
 import capitalize from "../../modules/capitalize-first.js";
 
-import useBossesData from "../../features/bosses/index.js";
+import { useBossesData } from "../../features/maps/index.js";
 import useItemsData from "../../features/items/index.js";
 import useMapsData, { useMapImages } from "../../features/maps/index.js";
 
