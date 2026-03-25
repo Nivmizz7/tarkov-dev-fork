@@ -179,6 +179,12 @@ class ItemsQuery extends APIQuery {
                     .filter(Boolean);
             }
 
+            if (rawItem.containsItems?.length) {
+                for (const ci of rawItem.containsItems) {
+                    ci.item = { id: ci.item };
+                }
+            }
+
             const deleteProperties = [
                 "propertiesType",
                 "contusionRadius",
