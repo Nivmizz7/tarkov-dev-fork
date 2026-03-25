@@ -192,6 +192,23 @@ class ItemsQuery extends APIQuery {
                 "maxDurability",
                 "repairCost",
                 "defaultAmmo",
+                "ballisticCoeficient",
+                "bulletDiameterMilimeters",
+                "bulletMassGrams",
+                "durabilityBurnFactor",
+                "failureToFeedChance",
+                "heatFactor",
+                "heavyBleedModifier",
+                "initialSpeed",
+                "lightBleedModifier",
+                "misfireChance",
+                "penetrationChance",
+                "penetrationPowerDeviation",
+                "ricochetChance",
+                "stackMaxSize",
+                "staminaBurnPerDamage",
+                "tracer",
+                "tracerColor",
             ];
             for (const propName of deleteProperties) {
                 delete rawItem.properties?.[propName];
