@@ -1,4 +1,4 @@
-import jp from "jsonpath";
+import { JSONPath } from "jsonpath-plus";
 
 const apiUrlProd = "https://json.tarkov.dev/";
 const apiUrlDev = "https://json-dev.tarkov.dev/";
@@ -48,8 +48,17 @@ export default async function apiRequest(path, options = {}) {
     // merge translations using jsonpath
     for (const jPath of responseData.translations ?? []) {
         try {
-            jp.apply(responseData, jPath, (key) => {
+            /*jp.apply(responseData, jPath, (key) => {
                 return langData[key] ?? key;
+            });*/
+            JSONPath({
+                path: jPath,
+                json: responseData,
+                resultType: "all",
+                callback: (result) => {
+                    const { path, value, parent, parentProperty } = result;
+                    parent[parentProperty] = langData[value] ?? value;
+                },
             });
         } catch (error) {
             console.error(error);
