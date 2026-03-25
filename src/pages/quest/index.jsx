@@ -199,7 +199,11 @@ function Quest() {
         }
         if (currentQuest.minPlayerLevel) {
             props.minPlayerLevel = {
-                value: currentQuest.minPlayerLevel,
+                value: (
+                    <span className={settings.playerLevel < currentQuest.minPlayerLevel ? "level-locked" : undefined}>
+                        {currentQuest.minPlayerLevel}
+                    </span>
+                ),
                 label: t("Minimum PMC Level"),
                 order: 1,
             };

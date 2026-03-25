@@ -430,7 +430,12 @@ function QuestTable({
                     if (!props.value) {
                         return "";
                     }
-                    return <CenterCell value={props.value} />;
+                    return (
+                        <CenterCell
+                            className={settings.playerLevel < props.value ? "level-locked" : undefined}
+                            value={props.value}
+                        />
+                    );
                 },
                 position: minimumLevel,
             });

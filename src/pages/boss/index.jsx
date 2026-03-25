@@ -254,7 +254,7 @@ function BossPage(params) {
             }
         }
         const ele = (
-            <span>
+            <span key={`spawn-map-${map.id}`}>
                 <span key={`spawn-map-${map.id}`}>{`${displayPercent}% `}</span>
                 <Link to={`/map/${map.normalizedName}`}>{`(${map.name})`}</Link>
             </span>

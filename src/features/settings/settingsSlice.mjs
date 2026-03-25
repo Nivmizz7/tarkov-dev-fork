@@ -8,7 +8,6 @@ export const fetchTarkovTrackerProgress = createAsyncThunk(
         }
 
         const returnData = {
-            hasFlea: true,
             playerLevel: 72,
             pmcFaction: "NONE",
             hideout: {},
@@ -56,7 +55,6 @@ export const fetchTarkovTrackerProgress = createAsyncThunk(
             }
             return completedObjectives;
         }, []);
-        returnData.hasFlea = progressData.playerLevel >= 15 ? true : false;
 
         returnData.playerLevel = progressData.playerLevel;
 
@@ -139,7 +137,6 @@ export const localStorageWriteJsonGameMode = (key, value) => {
 };
 
 const defaultSettings = {
-    "hasFlea": localStorageReadJson("useFlea", true),
     "playerLevel": 72,
     "pmcFaction": localStorageReadJson("pmcFaction", "NONE"),
     "useTarkovTracker": localStorageReadJson("useTarkovTracker", false),
@@ -199,8 +196,8 @@ const settingsSlice = createSlice({
             state[state.gameMode].tarkovTrackerAPIKey = action.payload;
             localStorageWriteJson(`${state.gameMode}Settings`, state[state.gameMode]);
         },
-        toggleFlea: (state, action) => {
-            state[state.gameMode].hasFlea = action.payload;
+        setPlayerLevel: (state, action) => {
+            state[state.gameMode].playerLevel = action.payload;
             localStorageWriteJson(`${state.gameMode}Settings`, state[state.gameMode]);
         },
         setMinDogtagLevel: (state, action) => {
@@ -288,8 +285,6 @@ const settingsSlice = createSlice({
                 state[state.gameMode].failedQuests = action.payload.questsFailed;
                 state[state.gameMode].objectivesCompleted = action.payload.objectivesCompleted;
                 state[state.gameMode].objectivesCompletionProgress = action.payload.objectivesCompletionProgress;
-                const fleaEnabled = localStorageReadJson("fleaEnabled", true);
-                state[state.gameMode].hasFlea = action.payload.hasFlea && fleaEnabled;
                 state[state.gameMode].playerLevel = action.payload.playerLevel;
                 state[state.gameMode].pmcFaction = action.payload.pmcFaction;
 
@@ -355,7 +350,7 @@ export const selectCompletedQuests = createSelector([selectSettings], (settings)
 
 export const {
     setTarkovTrackerAPIKey,
-    toggleFlea,
+    setPlayerLevel,
     setMinDogtagLevel,
     setStationOrTraderLevel,
     toggleTarkovTracker,

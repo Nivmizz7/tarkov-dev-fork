@@ -18,7 +18,7 @@ import capitalizeFirst from "../../modules/capitalize-first.js";
 import itemSearch from "../../modules/item-search.js";
 import fleaMarketFee from "../../modules/flea-market-fee.mjs";
 
-import useItemsData from "../../features/items/index.js";
+import useItemsData, { useHandbookData } from "../../features/items/index.js";
 
 import "./index.css";
 
@@ -41,9 +41,9 @@ const arrayChunk = (inputArray, chunkLength) => {
 };
 
 function LootTier(props) {
+    const settings = useSelector((state) => state.settings[state.settings.gameMode]);
     const [numberFilter, setNumberFilter] = useState(DEFAULT_MAX_ITEMS);
     const [minPrice, setMinPrice] = useStateWithLocalStorage("minPrice", 0);
-    const hasFlea = useSelector((state) => state.settings[state?.settings?.gameMode ?? "regular"].hasFlea);
     const [ignoreFleaSetting, setIgnoreFleaSetting] = useStateWithLocalStorage("ignoreFleaSetting", false);
     const [includeMarked, setIncludeMarked] = useStateWithLocalStorage("includeMarked", false);
     const [groupByType, setGroupByType] = useStateWithLocalStorage("groupByType", false);
@@ -138,6 +138,8 @@ function LootTier(props) {
 
     const { data: items } = useItemsData();
 
+    const { data: handbook } = useHandbookData();
+
     const itemData = useMemo(() => {
         return items
             .map((item) => {
@@ -174,7 +176,10 @@ function LootTier(props) {
                 // Use flea market if:
                 // 1. User has flea enabled
                 // 2. Ignore setting is on (regardless of user's flea setting)
-                const shouldUseFlea = hasFlea || ignoreFleaSetting;
+                const shouldUseFlea =
+                    ignoreFleaSetting ||
+                    (handbook.fleaMarket.enabled &&
+                        settings.playerLevel >= Math.max(handbook.fleaMarket.minPlayerLevel, item.minLevelForFlea));
 
                 if (shouldUseFlea && !item.types.includes("noFlea")) {
                     const fleaFee = fleaMarketFee(item.basePrice, item.lastLowPrice);
@@ -206,7 +211,7 @@ function LootTier(props) {
 
                 return true;
             });
-    }, [hasFlea, items, ignoreFleaSetting]);
+    }, [settings, items, handbook, ignoreFleaSetting]);
 
     const typeFilteredItems = useMemo(() => {
         const innerTypeFilteredItems = itemData.filter((item) => {

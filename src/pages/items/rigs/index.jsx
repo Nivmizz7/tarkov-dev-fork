@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
 import { Icon } from "@mdi/react";
@@ -13,12 +13,12 @@ import useStateWithLocalStorage from "../../../hooks/useStateWithLocalStorage.js
 import useItemsData from "../../../features/items/index.js";
 
 const marks = {
-    0: 25,
-    5: 20,
-    10: 15,
-    15: 10,
-    20: 5,
-    25: 0,
+    0: 0,
+    5: 5,
+    10: 10,
+    15: 15,
+    20: 20,
+    25: 25,
 };
 
 function Rigs() {
@@ -34,13 +34,18 @@ function Rigs() {
 
     const displayItems = useMemo(() => items.filter((item) => item.types.includes("rig")), [items]);
 
-    let maxSlots = Math.max(...displayItems.map((displayItem) => displayItem.properties.capacity || 0));
-    if (maxSlots === Infinity) {
-        maxSlots = 1;
-    }
+    const maxSlots = useMemo(() => {
+        let max = Math.max(...displayItems.map((displayItem) => displayItem.properties.capacity || 0));
+        if (max === Infinity) {
+            max = 1;
+        }
+        return max;
+    }, [displayItems]);
 
-    const handleMinSlotsChange = (newValueLabel) => {
-        setMinSlots(maxSlots - newValueLabel);
+    const minSlotDefault = useRef(minSlots);
+
+    const handleMinSlotsChange = (e) => {
+        setMinSlots(parseInt(e.target.value));
     };
 
     return [
@@ -71,12 +76,12 @@ function Rigs() {
                         checked={includeArmoredRigs}
                     />
                     <SliderFilter
-                        defaultValue={25 - minSlots}
+                        defaultValue={minSlotDefault.current}
                         label={t("Min slots")}
                         min={0}
-                        max={25}
+                        max={maxSlots}
                         marks={marks}
-                        reverse
+                        track={"inverted"}
                         onChange={handleMinSlotsChange}
                     />
                     <ToggleFilter label={t("3-slot")} onChange={(e) => setHas3Slot(!has3Slot)} checked={has3Slot} />

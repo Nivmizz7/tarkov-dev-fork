@@ -42,6 +42,12 @@
     display: none;
 }
 
+.basic-multi-select.language,
+.basic-multi-select.game-mode,
+.basic-multi-select.tracker-domain {
+    margin-left: 10px;
+}
+
 @media screen and (width >= 1280px) {
     .settings-group-wrapper {
         justify-content: flex-start;

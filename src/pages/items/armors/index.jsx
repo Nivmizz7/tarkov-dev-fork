@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
 import { Icon } from "@mdi/react";
@@ -32,6 +32,9 @@ function Armors(props) {
     const [maxArmorClassPlate, setMaxArmorClassPlate] = useStateWithLocalStorage("maxArmorClassPlate", 6);
     const [maxPrice, setMaxPrice] = useStateWithLocalStorage("armorMaxPrice", "");
     const { t } = useTranslation();
+
+    const defaultSoftArmor = useRef([minArmorClassSoft, maxArmorClassSoft]);
+    const defaultPlateArmor = useRef([minArmorClassPlate, maxArmorClassPlate]);
 
     const handleSoftArmorClassChange = ([min, max]) => {
         setMinArmorClassSoft(min);
@@ -88,7 +91,7 @@ function Armors(props) {
                         type="number"
                     />
                     <RangeFilter
-                        defaultValue={[minArmorClassSoft, maxArmorClassSoft]}
+                        defaultValue={defaultSoftArmor.current}
                         label={t("Soft armor class")}
                         min={0}
                         max={6}
@@ -98,7 +101,7 @@ function Armors(props) {
                         }}
                     />
                     <RangeFilter
-                        defaultValue={[minArmorClassPlate, maxArmorClassPlate]}
+                        defaultValue={defaultPlateArmor.current}
                         label={t("Plate armor class")}
                         min={0}
                         max={6}
