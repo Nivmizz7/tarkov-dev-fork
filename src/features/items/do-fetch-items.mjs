@@ -215,6 +215,8 @@ class ItemsQuery extends APIQuery {
                 "staminaBurnPerDamage",
                 "tracer",
                 "tracerColor",
+                "moa",
+                "default",
             ];
             for (const propName of deleteProperties) {
                 delete rawItem.properties?.[propName];
