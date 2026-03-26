@@ -431,7 +431,7 @@ function BossPage(params) {
                 </h2>
                 <ul>
                     {bossData.reports.map((report, index) => {
-                        const reportedMap = Object.values(allMaps).find((m) => m.id === report.map.id);
+                        const reportedMap = Object.values(allMaps).find((m) => m.id === report.map);
                         let relativeTime = getRelativeTimeAndUnit(new Date(parseInt(report.timestamp)).getTime());
                         return (
                             <li key={`report-${index}`}>
