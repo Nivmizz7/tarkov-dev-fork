@@ -217,6 +217,11 @@ class ItemsQuery extends APIQuery {
                 "tracerColor",
                 "moa",
                 "default",
+                "compressorAttack",
+                "compressorGain",
+                "compressorRelease",
+                "compressorThreshold",
+                "dryVolume",
             ];
             for (const propName of deleteProperties) {
                 delete rawItem.properties?.[propName];
