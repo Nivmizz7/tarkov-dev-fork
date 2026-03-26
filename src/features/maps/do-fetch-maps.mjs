@@ -11,17 +11,19 @@ class MapsQuery extends APIQuery {
         const [mapsData] = await Promise.all([this.apiRequest(`${gameMode}/maps`, { lang: language })]);
 
         for (const map of Object.values(mapsData.maps)) {
-            for (const boss of map.bosses) {
-                boss.name = mapsData.mobs[boss.id].name;
-                boss.normalizedName = mapsData.mobs[boss.id].normalizedName;
-                boss.escorts = boss.escorts.map((escort) => {
-                    escort.name = mapsData.mobs[escort.id].name;
-                    escort.normalizedName = mapsData.mobs[escort.id].normalizedName;
+            for (const spawn of map.bosses) {
+                spawn.id = spawn.mob;
+                spawn.name = mapsData.mobs[spawn.mob].name;
+                spawn.normalizedName = mapsData.mobs[spawn.mob].normalizedName;
+                spawn.escorts = spawn.escorts.map((escort) => {
+                    escort.id = escort.mob;
+                    escort.name = mapsData.mobs[escort.mob].name;
+                    escort.normalizedName = mapsData.mobs[escort.mob].normalizedName;
                     return escort;
                 });
-                if (boss.switch) {
-                    boss.switch = {
-                        id: boss.switch,
+                if (spawn.switch) {
+                    spawn.switch = {
+                        id: spawn.switch,
                     };
                 }
             }
