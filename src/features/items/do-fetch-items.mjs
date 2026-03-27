@@ -237,6 +237,10 @@ class ItemsQuery extends APIQuery {
                 "compressorRelease",
                 "compressorThreshold",
                 "dryVolume",
+                "armorType",
+                "bluntThroughput",
+                "ricochetX",
+                "ricochetZ",
             ];
             for (const propName of deleteProperties) {
                 delete rawItem.properties?.[propName];
