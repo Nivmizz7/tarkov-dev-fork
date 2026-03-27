@@ -179,6 +179,21 @@ class ItemsQuery extends APIQuery {
                     .filter(Boolean);
             }
 
+            if (rawItem.properties?.armorSlots) {
+                for (const slot of rawItem.properties.armorSlots) {
+                    if (!slot.allowedPlates) {
+                        continue;
+                    }
+                    slot.allowedPlates = slot.allowedPlates.map((id) => {
+                        return { id };
+                    });
+                }
+            }
+
+            if (rawItem.properties?.material) {
+                rawItem.properties.material = { id: rawItem.properties.material };
+            }
+
             if (rawItem.containsItems?.length) {
                 for (const ci of rawItem.containsItems) {
                     ci.item = { id: ci.item };
