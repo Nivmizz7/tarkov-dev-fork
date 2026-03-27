@@ -65,7 +65,14 @@ function processFetchedItems(allData) {
 const initialState = {
     data: {
         items: [],
-        handbook: {},
+        handbook: {
+            fleaMarket: {},
+            armorMaterials: [],
+            itemCategories: [],
+            handbookCategories: [],
+            playerLevels: [],
+            skills: [],
+        },
     },
     status: "idle",
     error: null,

@@ -51,12 +51,15 @@ export const selectHideoutModules = (state) => state.hideout.data;
 
 export const selectAllHideoutModules = createSelector([selectHideoutModules, selectAllCrafts], (stations, crafts) => {
     return stations.map((station) => {
-        station.crafts = crafts.reduce((crafts, craft) => {
-            if (craft.station.id === station.id) {
-                crafts.push({ id: craft.id });
-            }
-            return crafts;
-        }, []);
+        return {
+            ...station,
+            crafts: crafts.reduce((crafts, craft) => {
+                if (craft.station.id === station.id) {
+                    crafts.push({ id: craft.id });
+                }
+                return crafts;
+            }, []),
+        };
     });
 });
 
@@ -71,7 +74,8 @@ const clearRefreshInterval = () => {
 
 export default function useHideoutData() {
     const dispatch = useDispatch();
-    const { data, status, error } = useSelector((state) => state.hideout);
+    const { status, error } = useSelector((state) => state.hideout);
+    const data = useSelector(selectAllHideoutModules);
     const lang = useLangCode();
     const gameMode = useSelector((state) => state.settings.gameMode);
 

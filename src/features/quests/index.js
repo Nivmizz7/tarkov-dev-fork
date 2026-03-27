@@ -153,7 +153,7 @@ export const selectQuestsWithActive = createSelector(
                 quest[rewardKey] = { ...quest[rewardKey] };
                 quest[rewardKey].skillLevelReward = quest[rewardKey].skillLevelReward.map((r) => {
                     const rew = { ...r };
-                    rew.name = items.handbook.skills?.find((skill) => skill.id === rew.skill).name;
+                    rew.name = items.handbook.skills?.find((skill) => skill.id === rew.skill)?.name ?? rew.skill;
                     return rew;
                 });
             }

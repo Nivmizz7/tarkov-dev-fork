@@ -128,6 +128,9 @@ function CraftTable({
                 let totalCost = 0;
 
                 const station = hideout.find((s) => s.id === craftRow.station.id);
+                if (!station) {
+                    return false;
+                }
                 const stationNormalized = station.normalizedName;
                 const level = craftRow.level;
 
