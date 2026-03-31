@@ -252,14 +252,17 @@ function Quest() {
             };
         }
         if (currentQuest?.map) {
-            props.map = {
-                value: <Link to={`/map/${currentQuest.map.normalizedName}`}>{currentQuest.map.name}</Link>,
-                label: t("Map"),
-                order: 4,
-            };
+            const map = maps.find((m) => m.id === currentQuest.map.id);
+            if (map) {
+                props.map = {
+                    value: <Link to={`/map/${map.normalizedName}`}>{map.name}</Link>,
+                    label: t("Map"),
+                    order: 4,
+                };
+            }
         }
         return props;
-    }, [currentQuest, traders, t]);
+    }, [currentQuest, traders, maps, t]);
 
     const getTaskStatusIcon = useCallback(
         (status, options = {}) => {
