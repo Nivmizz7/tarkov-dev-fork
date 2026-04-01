@@ -82,7 +82,7 @@ class ItemsQuery extends APIQuery {
                             type: "loyaltyLevel",
                             value: offer.minTraderLevel,
                         },
-                        offer.questUnlock ? { type: "questCompleted", stringValue: offer.questUnlock } : undefined,
+                        offer.taskUnlock ? { type: "questCompleted", stringValue: offer.taskUnlock } : undefined,
                     ].filter(Boolean),
                 });
             }
