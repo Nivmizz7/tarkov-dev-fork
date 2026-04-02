@@ -11,10 +11,9 @@ class ItemsQuery extends APIQuery {
     async query(options) {
         const { language, gameMode, prebuild } = options;
         //console.time('items query');
-        const [itemData, traders, traderOffers, itemGrids] = await Promise.all([
+        const [itemData, traders, itemGrids] = await Promise.all([
             this.apiRequest(`${gameMode}/items`, { lang: language }),
             this.apiRequest(`${gameMode}/traders`, { lang: language }),
-            this.apiRequest(`${gameMode}/trader_cash_offers`),
             new Promise(async (resolve) => {
                 if (prebuild) {
                     return resolve({});
@@ -62,7 +61,7 @@ class ItemsQuery extends APIQuery {
                     ],
                 });
             }
-            for (const offer of traderOffers[rawItem.id] ?? []) {
+            for (const offer of rawItem.buyFromTrader ?? []) {
                 rawItem.buyFor.push({
                     vendor: {
                         // offer.trader
@@ -86,6 +85,7 @@ class ItemsQuery extends APIQuery {
                     ].filter(Boolean),
                 });
             }
+            delete rawItem.buyFromTrader;
 
             rawItem.sellFor = [];
             if (rawItem.lastLowPrice) {
@@ -105,7 +105,7 @@ class ItemsQuery extends APIQuery {
                     ],
                 });
             }
-            for (const offer of rawItem.traderPrices) {
+            for (const offer of rawItem.sellToTrader ?? []) {
                 rawItem.sellFor.push({
                     vendor: {
                         // offer.trader
@@ -123,6 +123,7 @@ class ItemsQuery extends APIQuery {
                     requirements: [],
                 });
             }
+            delete rawItem.sellToTrader;
 
             rawItem.categoryIds = rawItem.categories;
             rawItem.categories = rawItem.categories.map((id) => {
