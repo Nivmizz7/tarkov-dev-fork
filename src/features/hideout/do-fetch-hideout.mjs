@@ -14,6 +14,7 @@ class HideoutQuery extends APIQuery {
             for (const level of station.levels) {
                 for (const req of level.itemRequirements) {
                     req.item = { id: req.item };
+                    req.quantity = req.count;
                     req.attributes = Object.keys(req.attributes ?? []).map((attName) => {
                         return {
                             name: attName,
@@ -31,6 +32,7 @@ class HideoutQuery extends APIQuery {
                     req.trader = {
                         id: req.trader,
                     };
+                    req.level = req.value;
                 }
             }
             return station;
