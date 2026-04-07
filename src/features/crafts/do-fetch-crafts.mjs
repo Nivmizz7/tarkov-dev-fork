@@ -27,6 +27,7 @@ class CraftsQuery extends APIQuery {
                 });
                 return req;
             });
+            craft.rewardItems ??= [craft.productItem];
             craft.rewardItems = craft.rewardItems.map((req) => {
                 req.item = { id: req.item };
                 return req;

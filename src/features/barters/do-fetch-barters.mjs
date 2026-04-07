@@ -25,6 +25,7 @@ class BartersQuery extends APIQuery {
                 });
                 return req;
             });
+            barter.rewardItems ??= [barter.offeredItem];
             barter.rewardItems = barter.rewardItems.map((req) => {
                 req.item = { id: req.item };
                 return req;
