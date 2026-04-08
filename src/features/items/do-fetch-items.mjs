@@ -194,7 +194,7 @@ class ItemsQuery extends APIQuery {
             if (rawItem.properties?.material) {
                 rawItem.properties.material = { id: rawItem.properties.material };
             }
-            console.log(rawItem);
+
             for (const grid of rawItem.properties?.grids ?? []) {
                 grid.filters.allowedCategories = grid.filters.allowedCategories.map((id) => {
                     return { id };
