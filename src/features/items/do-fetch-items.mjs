@@ -194,6 +194,21 @@ class ItemsQuery extends APIQuery {
             if (rawItem.properties?.material) {
                 rawItem.properties.material = { id: rawItem.properties.material };
             }
+            console.log(rawItem);
+            for (const grid of rawItem.properties?.grids ?? []) {
+                grid.filters.allowedCategories = grid.filters.allowedCategories.map((id) => {
+                    return { id };
+                });
+                grid.filters.allowedItems = grid.filters.allowedItems.map((id) => {
+                    return { id };
+                });
+                grid.filters.excludedCategories = grid.filters.excludedCategories.map((id) => {
+                    return { id };
+                });
+                grid.filters.excludedItems = grid.filters.excludedItems.map((id) => {
+                    return { id };
+                });
+            }
 
             if (rawItem.containsItems?.length) {
                 for (const ci of rawItem.containsItems) {
