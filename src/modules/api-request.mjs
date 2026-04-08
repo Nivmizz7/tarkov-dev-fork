@@ -40,24 +40,19 @@ export default async function apiRequest(path, options = {}) {
         // no translation necessary
         return responseData.data;
     }
-    // merge fallback translation into primary translation
-    const langData = {
-        ...langFallbackData.data,
-        ...langPrimaryData.data,
-    };
     // merge translations using jsonpath
     for (const jPath of responseData.translations ?? []) {
         try {
-            /*jp.apply(responseData, jPath, (key) => {
-                return langData[key] ?? key;
-            });*/
             JSONPath({
                 path: jPath,
                 json: responseData,
                 resultType: "all",
                 callback: (result) => {
                     const { path, value, parent, parentProperty } = result;
-                    parent[parentProperty] = langData[value] ?? value;
+                    // try primary language first
+                    // then try fallback
+                    // then use the translation key if no translation available
+                    parent[parentProperty] = langPrimaryData.data[value] ?? langFallbackData.data[value] ?? value;
                 },
             });
         } catch (error) {
