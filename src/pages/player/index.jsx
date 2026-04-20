@@ -546,6 +546,25 @@ function Player() {
                 },
             },
             {
+                Header: t("PMC Kills"),
+                id: "killsPmc",
+                accessor: "killsPmc",
+                Cell: (props) => {
+                    return props.value;
+                },
+            },
+            {
+                Header: t("PMC K:D", { nsSeparator: "|" }),
+                id: "kdrPmc",
+                accessor: "killsPmc",
+                Cell: (props) => {
+                    if (props.value === 0) {
+                        return "0";
+                    }
+                    return (props.value / props.row.original.kia).toFixed(2);
+                },
+            },
+            {
                 Header: t("Win Streak"),
                 id: "streak",
                 accessor: "streak",
@@ -590,6 +609,10 @@ function Player() {
             {
                 name: "streak",
                 key: ["LongestWinStreak"],
+            },
+            {
+                name: "killsPmc",
+                key: ["KilledPmc"],
             },
         ];
         const getStats = (side) => {
