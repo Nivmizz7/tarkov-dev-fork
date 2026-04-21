@@ -15,6 +15,7 @@ class BartersQuery extends APIQuery {
             barter.trader = {
                 id: barter.trader,
             };
+            barter.level = barter.minTraderLevel;
             barter.requiredItems = barter.requiredItems.map((req) => {
                 req.item = { id: req.item };
                 req.attributes = Object.keys(req.attributes).map((attName) => {
