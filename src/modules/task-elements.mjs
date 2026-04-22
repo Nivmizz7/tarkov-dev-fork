@@ -135,13 +135,19 @@ export function TaskObjective({ objective, items, bosses, quests, traders, maps,
                     <>
                         <h4>{t("Contains Item in Category")}</h4>
                         <ul>
-                            {objective.containsCategory.map((cat) => {
-                                return (
-                                    <li key={cat.id} className={"quest-list-item-category"}>
-                                        <Link to={`/items/${cat.normalizedName}`}>{cat.name}</Link>
-                                    </li>
-                                );
-                            })}
+                            {objective.containsCategory
+                                .map((c) => {
+                                    const category = handbook.itemCategories.find((cat) => cat.id === c.id);
+                                    if (!category) {
+                                        return;
+                                    }
+                                    return (
+                                        <li key={category.id} className={"quest-list-item-category"}>
+                                            <Link to={`/items/${category.normalizedName}`}>{category.name}</Link>
+                                        </li>
+                                    );
+                                })
+                                .filter(Boolean)}
                         </ul>
                     </>
                 )}
