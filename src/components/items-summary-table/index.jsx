@@ -85,6 +85,9 @@ function ItemsSummaryTable({ includeItems, includeTraders, includeStations }) {
             });
         for (const req of includeTraders) {
             const trader = traders.find((t) => t.id === req.trader.id);
+            if (!trader) {
+                continue;
+            }
             requiredItems.push({
                 ...trader,
                 quantity: req.level,

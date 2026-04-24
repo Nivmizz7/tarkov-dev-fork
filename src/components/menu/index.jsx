@@ -11,7 +11,7 @@ import { Box, Alert, IconButton, Collapse, LinearProgress } from "@mui/material"
 
 import { caliberArrayWithSplit } from "../../modules/format-ammo.mjs";
 import categoryPages from "../../data/category-pages.json";
-import useBossesData from "../../features/bosses/index.js";
+import { useBossesData } from "../../features/maps/index.js";
 
 import { mapIcons, useMapImagesSortedArray } from "../../features/maps/index.js";
 import { setGameMode } from "../../features/settings/settingsSlice.mjs";

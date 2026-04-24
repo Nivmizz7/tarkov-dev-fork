@@ -135,13 +135,19 @@ export function TaskObjective({ objective, items, bosses, quests, traders, maps,
                     <>
                         <h4>{t("Contains Item in Category")}</h4>
                         <ul>
-                            {objective.containsCategory.map((cat) => {
-                                return (
-                                    <li key={cat.id} className={"quest-list-item-category"}>
-                                        <Link to={`/items/${cat.normalizedName}`}>{cat.name}</Link>
-                                    </li>
-                                );
-                            })}
+                            {objective.containsCategory
+                                .map((c) => {
+                                    const category = handbook.itemCategories.find((cat) => cat.id === c.id);
+                                    if (!category) {
+                                        return;
+                                    }
+                                    return (
+                                        <li key={category.id} className={"quest-list-item-category"}>
+                                            <Link to={`/items/${category.normalizedName}`}>{category.name}</Link>
+                                        </li>
+                                    );
+                                })
+                                .filter(Boolean)}
                         </ul>
                     </>
                 )}
@@ -535,12 +541,12 @@ export function TaskObjective({ objective, items, bosses, quests, traders, maps,
         );
     }
     if (objective.type === "skill") {
-        const skill = handbook.skills.find((s) => s.id === objective.skillLevel.skill.id);
+        const skill = handbook.skills?.find((s) => s.id === objective.skillLevel.skill.id);
         taskDetails = (
             <>
                 {t("Obtain level {{level}} {{skillName}} skill", {
                     level: objective.skillLevel.level,
-                    skillName: skill.name,
+                    skillName: skill?.name ?? objective.skillLevel.skill.id,
                 })}
             </>
         );
@@ -676,7 +682,7 @@ export function TaskObjective({ objective, items, bosses, quests, traders, maps,
                         {objective.maps.map((m, i) => [
                             i > 0 && ", ",
                             <Link key={i} to={`/map/${maps.find((map) => map.id === m.id)?.normalizedName}${mapQuery}`}>
-                                {m.name}
+                                {maps.find((map) => map.id === m.id)?.name}
                             </Link>,
                         ])}
                     </div>
@@ -778,6 +784,9 @@ export function TaskRewards({ rewards, t, items, settings, traders, stations, ac
                 <ul className="quest-item-list">
                     {rewards.traderStanding.map((standing) => {
                         const trader = traders.find((t) => t.id === standing.trader.id);
+                        if (!trader) {
+                            return <li key={standing.trader.id}></li>;
+                        }
                         return (
                             <li className="quest-list-item" key={standing.trader.id}>
                                 <TraderImage trader={trader} reputationChange={standing.standing} />
