@@ -28,7 +28,7 @@ function RewardCell({
 }) {
     const dispatch = useDispatch();
     const { t } = useTranslation();
-
+    //console.log(item, sellTo);
     const [customPrice, setCustomPrice] = useState(sellValue);
     const [editingCustomPrice, setEditingCustomPrice] = useState(false);
 

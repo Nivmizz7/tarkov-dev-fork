@@ -19,6 +19,8 @@ updates:
           - "*"
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 90
     ignore:
       - dependency-name: "i18next"
         update-types: ["version-update:semver-major"]
